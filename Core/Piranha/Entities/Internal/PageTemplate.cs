@@ -188,6 +188,7 @@ namespace Piranha.Models
 		/// <param name="record">The record.</param>
 		public void InvalidateRecord(PageTemplate record) {
 			Application.Current.CacheProvider.Remove(record.Id.ToString());
+            Application.Current.CacheProvider.Remove("RT_" + record.Id);
 		}
 	}
 }

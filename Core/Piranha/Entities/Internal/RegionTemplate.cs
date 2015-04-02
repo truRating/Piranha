@@ -23,7 +23,7 @@ namespace Piranha.Models
 	/// </summary>
 	[PrimaryKey(Column = "regiontemplate_id")]
 	[Serializable]
-	public class RegionTemplate : PiranhaRecord<RegionTemplate>
+    public class RegionTemplate : PiranhaRecord<RegionTemplate>, ICacheRecord<RegionTemplate>
 	{
 		#region Fields
 		[Column(Name = "regiontemplate_id")]
@@ -83,9 +83,17 @@ namespace Piranha.Models
 		/// </summary>
 		/// <param name="templateid">The template id</param>
 		/// <returns>The region templates</returns>
-		public static List<RegionTemplate> GetByTemplateId(Guid templateid) {
-			return Get("regiontemplate_template_id = @0", templateid, new Params() { OrderBy = "regiontemplate_seqno ASC" });
-		}
+        public static List<RegionTemplate> GetByTemplateId(Guid templateid)
+        {
+            if (!Application.Current.CacheProvider.Contains("RT_" + templateid))
+                Application.Current.CacheProvider["RT_" + templateid] = Get("regiontemplate_template_id = @0", templateid, new Params { OrderBy = "regiontemplate_seqno ASC" });
+            return (List<RegionTemplate>)Application.Current.CacheProvider["RT_" + templateid];
+        }
 		#endregion
+
+	    public void InvalidateRecord(RegionTemplate record)
+	    {
+            Application.Current.CacheProvider.Remove(record.Id.ToString());
+	    }
 	}
 }

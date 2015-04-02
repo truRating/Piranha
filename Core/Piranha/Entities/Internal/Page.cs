@@ -510,7 +510,8 @@ namespace Piranha.Models
 		/// <param name="record">The record</param>
 		public void InvalidateRecord(Page record) {
 			Application.Current.CacheProvider.Remove(record.Id.ToString());
-
+            Application.Current.CacheProvider.Remove("RGCP_" + record.Id);
+            Application.Current.CacheProvider.Remove("PGCP_" + record.Id);
 			// If we click save & publish right away the permalink is not created yet.
 			if (record.Permalink != null && PermalinkCache.ContainsKey(record.SiteTreeId) && PermalinkCache[record.SiteTreeId].ContainsKey(record.Permalink))
 				PermalinkCache[record.SiteTreeId].Remove(record.Permalink);

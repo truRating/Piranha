@@ -109,7 +109,11 @@ namespace Piranha.Models
 		/// <param name="draft">Whether to get the draft version or not</param>
 		/// <returns>The properties</returns>
 		public static List<Property> GetContentByParentId(Guid id, bool draft = false) {
-			return GetFields("property_name, property_value", "property_parent_id = @0 AND property_draft = @1", id, draft);
+            if (draft)
+                return GetFields("property_name, property_value", "property_parent_id = @0 AND property_draft = @1", id, true);
+            if (!Application.Current.CacheProvider.Contains("PGCP_" + id))
+                Application.Current.CacheProvider["PGCP_" + id] = GetFields("property_name, property_value", "property_parent_id = @0 AND property_draft = @1", id, false);
+            return (List<Property>)Application.Current.CacheProvider["PGCP_" + id];
 		}
 	}
 }

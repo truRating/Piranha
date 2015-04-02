@@ -86,7 +86,7 @@ namespace Piranha.Models
 		/// Gets/sets the internal body json data.
 		/// </summary>
 		[Column(Name = "region_body", OnSave = "OnBodySave")]
-		private string InternalBody { get; set; }
+		public string InternalBody { get; set; }
 
 		/// <summary>
 		/// Gets/sets the deserialized json body.
@@ -147,7 +147,11 @@ namespace Piranha.Models
 		/// <param name="draft">Whether this is a draft</param>
 		/// <returns>The regions</returns>
 		public static List<Region> GetContentByPageId(Guid id, bool draft = false) {
-			return GetFields("regiontemplate_internal_id, regiontemplate_type, region_body", "region_page_id = @0 AND region_draft = @1", id, draft);
+            if (draft)
+                return GetFields("regiontemplate_internal_id, regiontemplate_type, region_body", "region_page_id = @0 AND region_draft = @1", id, true);
+            if (!Application.Current.CacheProvider.Contains("RGCP_" + id))
+                Application.Current.CacheProvider["RGCP_" + id] = GetFields("regiontemplate_internal_id, regiontemplate_type, region_body", "region_page_id = @0 AND region_draft = @1", id, false);
+            return (List<Region>)Application.Current.CacheProvider["RGCP_" + id];
 		}
 
 		/// <summary>
