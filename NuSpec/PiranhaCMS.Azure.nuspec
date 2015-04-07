@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
 	<metadata>
 		<id>PiranhaCMS.Azure</id>
-		<version>2.2.5-alpha1</version>
+		<version>2.2.5-alpha2</version>
 		<title>Piranha CMS Azure</title>
 		<authors>Håkan Edling</authors>
 		<licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
@@ -20,11 +20,11 @@ http://piranhacms.org/home/changelog
 				<dependency id="Microsoft.Data.Edm" version="[5.6.3, 5.7.0)" />
 				<dependency id="Microsoft.Data.OData" version="[5.6.3, 5.7.0)" />
 				<dependency id="Microsoft.Data.Services.Client" version="[5.6.3, 5.7.0)" />
-				<dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="[2.0.3, 2.1.0)" />
+				<dependency id="Microsoft.WindowsAzure.ConfigurationManager" version="[3.1.0]" />
 				<dependency id="Newtonsoft.Json" version="[6.0.6, 6.1.0)" />
 				<dependency id="System.Spatial" version="[5.6.3, 5.7.0)" />
 				<dependency id="WindowsAzure.Storage" version="[4.3.0, 4.4.0)" />
-				<dependency id="PiranhaCMS.Core" version="[2.2.5-alpha1, 2.3.0)" />
+				<dependency id="PiranhaCMS.Core" version="[2.2.5-alpha2, 2.3.0)" />
 			</group>
 		</dependencies>
 	</metadata>
