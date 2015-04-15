@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{A2EFCC5C-B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{4C6B1406-6B43-44D6-8120-250F0DA314FB}"
 EndProject
-Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TemplateSite", "http://localhost:8775", "{FF250F87-B87C-4955-92F0-BF2587EEA49B}"
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TemplateSite(1)", "http://localhost:8775", "{FF250F87-B87C-4955-92F0-BF2587EEA49B}"
 	ProjectSection(WebsiteProperties) = preProject
 		UseIISExpress = "true"
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.5"
@@ -57,11 +57,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuspec", ".nuspec", "{17A6
 	ProjectSection(SolutionItems) = preProject
 		NuSpec\PiranhaCMS.Azure.nuspec = NuSpec\PiranhaCMS.Azure.nuspec
 		NuSpec\PiranhaCMS.Core.nuspec = NuSpec\PiranhaCMS.Core.nuspec
+		NuSpec\PiranhaCMS.Localization.nuspec = NuSpec\PiranhaCMS.Localization.nuspec
 		NuSpec\PiranhaCMS.Mvc.nuspec = NuSpec\PiranhaCMS.Mvc.nuspec
 		NuSpec\PiranhaCMS.nuspec = NuSpec\PiranhaCMS.nuspec
 		NuSpec\PiranhaCMS.WebPages.nuspec = NuSpec\PiranhaCMS.WebPages.nuspec
 		NuSpec\PiranhaCMSMvc.nuspec = NuSpec\PiranhaCMSMvc.nuspec
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Piranha.Localization", "Modules\Piranha.Localization\Piranha.Localization.csproj", "{4D921A71-8159-42AF-93A0-78628FADCFF7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -97,6 +100,10 @@ Global
 		{8405AD59-101A-479B-A12D-66F79D478602}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8405AD59-101A-479B-A12D-66F79D478602}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8405AD59-101A-479B-A12D-66F79D478602}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D921A71-8159-42AF-93A0-78628FADCFF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D921A71-8159-42AF-93A0-78628FADCFF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D921A71-8159-42AF-93A0-78628FADCFF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D921A71-8159-42AF-93A0-78628FADCFF7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,5 +116,6 @@ Global
 		{1723FD00-638C-4470-A6CB-DBB09A555E51} = {9D450DB0-B1BC-49E6-9B3E-7A915FA2EFE5}
 		{FF250F87-B87C-4955-92F0-BF2587EEA49B} = {4C6B1406-6B43-44D6-8120-250F0DA314FB}
 		{8405AD59-101A-479B-A12D-66F79D478602} = {C3C647AC-13A0-4ABC-A448-8B4E589B4B05}
+		{4D921A71-8159-42AF-93A0-78628FADCFF7} = {A2EFCC5C-B2D4-4D26-929D-620D4BBF5C1B}
 	EndGlobalSection
 EndGlobal
