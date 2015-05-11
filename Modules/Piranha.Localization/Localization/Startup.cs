@@ -91,7 +91,7 @@ namespace Piranha.Localization
 			//
             Hooks.Manager.Toolbar.PageEditToolbarRender += (url, str, model) =>
             {
-                str.Append(String.Format("<li><a href=\"{0}\"><span class=\"flag flag-gb\"></span>English (UK)</a>{1}</li>",
+                str.Append(String.Format("<li><a href=\"{0}\"><span class=\"flag flag-gb\"></span>English</a>{1}</li>",
                     url.Action("edit", new { id = model.Page.Id }), Previews(model, "en-gb", url)));
 
                 foreach (var lang in Module.Languages)
@@ -127,13 +127,8 @@ namespace Piranha.Localization
 	    {
 	        if (model.SiteTree.HostNames == null)
 	            return string.Empty;
-	        var sb = new StringBuilder();
-	        foreach (var hostName in model.SiteTree.HostNames.Split(','))
-	        {
-                sb.AppendFormat("<a href=\"{0}/{1}{2}\" class=\"preview\" target=\"preview\">Preview</a>", WebPiranha.GetSiteUrl(hostName), culture.ToLower(),
-	                url.GetPermalink(model.Page.Permalink, true));
-	        }
-	        return sb.ToString();
+	        var hostName = model.SiteTree.HostNames.Split(',').FirstOrDefault();
+            return  string.Format("<a href=\"{0}/{1}{2}\" class=\"preview\" target=\"preview\">Preview</a>", WebPiranha.GetSiteUrl(hostName), culture.ToLower(),url.GetPermalink(model.Page.Permalink, true));
 	    }
 
 	    private static void ResetCulture(System.Web.HttpContextBase context) {

@@ -111,11 +111,11 @@
                 if (Model.SiteTree != null && !string.IsNullOrEmpty(Model.SiteTree.HostNames))
                 {
                     <li>
-                        @foreach (var hostName in Model.SiteTree.HostNames.Split(','))
-                        {
+                        @{
+                            var hostName = Model.SiteTree.HostNames.Split(',').FirstOrDefault();
                             <a href="@Piranha.WebPages.WebPiranha.GetSiteUrl(hostName)@Url.GetPermalink(Model.Page.Permalink, true)" target="preview" class="preview">@Piranha.Resources.Global.ToolbarPreview</a>
                         }
-                        </li>
+                    </li>
                 }
                 else
                 {
