@@ -91,8 +91,8 @@ namespace Piranha.Localization
 			//
             Hooks.Manager.Toolbar.PageEditToolbarRender += (url, str, model) =>
             {
-                str.Append(String.Format("<li><a href=\"{0}\"><span class=\"flag flag-gb\"></span>English (UK)</a></li>",
-                    url.Action("edit", new { id = model.Page.Id })));
+                str.Append(String.Format("<li><a href=\"{0}\"><span class=\"flag flag-gb\"></span>English (UK)</a>{1}</li>",
+                    url.Action("edit", new { id = model.Page.Id }), Previews(model, "en-gb", url)));
 
                 foreach (var lang in Module.Languages)
                 {
