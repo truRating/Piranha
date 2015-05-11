@@ -649,11 +649,11 @@ namespace Piranha.Models.Manager.PageModels
 			}
 
 			// Get the site if this is a site page
-			if (Permalink.Type == Models.Permalink.PermalinkType.SITE) {
+			//if (Permalink.Type == Models.Permalink.PermalinkType.SITE) {
 				using (var db = new DataContext()) {
 					SiteTree = db.SiteTrees.Where(s => s.Id == Page.SiteTreeId).Single();
 				}
-			}
+			//}
 
 			// Check if the page can be published
 			if (Page.OriginalId != Guid.Empty) {

@@ -169,9 +169,7 @@ namespace Piranha.WebPages
 
         public static string GetSiteUrl(string hostName)
         {
-            var context = HttpContext.Current;
-            var url = "http://" + hostName.Trim() +
-                      (!context.Request.Url.IsDefaultPort ? ":" + context.Request.Url.Port : "");
+            var url = "http://" + hostName.Trim();
             if (url.EndsWith("/"))
                 return url.Substring(0, url.Length - 1);
             return url;

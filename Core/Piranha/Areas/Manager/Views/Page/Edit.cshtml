@@ -110,10 +110,12 @@
             {
                 if (Model.SiteTree != null && !string.IsNullOrEmpty(Model.SiteTree.HostNames))
                 {
-                    foreach (var hostName in Model.SiteTree.HostNames.Split(','))
-                    {
-                        <li><a href="@Piranha.WebPages.WebPiranha.GetSiteUrl(hostName)@Url.GetPermalink(Model.Page.Permalink, true)" target="preview" class="preview">@Piranha.Resources.Global.ToolbarPreview</a></li>
-                    }
+                    <li>
+                        @foreach (var hostName in Model.SiteTree.HostNames.Split(','))
+                        {
+                            <a href="@Piranha.WebPages.WebPiranha.GetSiteUrl(hostName)@Url.GetPermalink(Model.Page.Permalink, true)" target="preview" class="preview">@Piranha.Resources.Global.ToolbarPreview</a>
+                        }
+                        </li>
                 }
                 else
                 {

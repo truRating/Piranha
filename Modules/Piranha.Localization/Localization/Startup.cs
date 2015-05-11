@@ -8,7 +8,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using System.Web.Mvc;
+using Piranha.Models.Manager.PageModels;
+using Piranha.Web;
 using WebActivatorEx;
 using Piranha.WebPages;
 
@@ -92,9 +96,11 @@ namespace Piranha.Localization
 
                 foreach (var lang in Module.Languages)
                 {
-                    str.Append(String.Format("<li><a href=\"{0}\"><span class=\"flag flag-{2}\"></span> {1}</a></li>",
-                        "/" + lang.UrlPrefix + url.Action("edit", new { id = model.Page.Id }),
-                        lang.Name, lang.Culture.Split('-')[1].ToLower()));
+                    str.Append(
+                        String.Format(
+                            "<li><a href=\"{0}\"><span class=\"flag flag-{2}\"></span> {1}</a>{3}",
+                            "/" + lang.UrlPrefix + url.Action("edit", new {id = model.Page.Id}),
+                            lang.Name, lang.Culture.Split('-')[1].ToLower(), Previews(model,lang.Culture, url)));
                 }
 
 				//
@@ -117,7 +123,20 @@ namespace Piranha.Localization
 			};
 		}
 
-		private static void ResetCulture(System.Web.HttpContextBase context) {
+	    private static string Previews(EditModel model, string culture, UrlHelper url)
+	    {
+	        if (model.SiteTree.HostNames == null)
+	            return string.Empty;
+	        var sb = new StringBuilder();
+	        foreach (var hostName in model.SiteTree.HostNames.Split(','))
+	        {
+                sb.AppendFormat("<a href=\"{0}/{1}{2}\" class=\"preview\" target=\"preview\">Preview</a>", WebPiranha.GetSiteUrl(hostName), culture.ToLower(),
+	                url.GetPermalink(model.Page.Permalink, true));
+	        }
+	        return sb.ToString();
+	    }
+
+	    private static void ResetCulture(System.Web.HttpContextBase context) {
 			var def = Utils.GetDefaultCulture();
 
 			if (def.Name != CultureInfo.CurrentUICulture.Name) {
