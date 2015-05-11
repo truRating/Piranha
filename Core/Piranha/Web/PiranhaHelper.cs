@@ -10,11 +10,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.Mvc;
 using Piranha.Models;
 
@@ -32,10 +35,23 @@ namespace Piranha.Web
 		/// <param name="permalink">The permalink</param>
 		/// <param name="draft">Whether to generate a link to the draft</param>
 		/// <returns>An action url</returns>
-		public static string GetPermalink(this UrlHelper helper, string permalink, bool draft = false) {
+		public static string GetPermalink(this UrlHelper helper, string permalink, bool draft = false)
+		{
+		    var culture = string.Empty;
+		    try
+		    {
+                var cultureInfo = new CultureInfo(((GlobalizationSection)WebConfigurationManager.GetSection("system.web/globalization")).UICulture);
+		        if (Thread.CurrentThread.CurrentUICulture.Name != cultureInfo.Name)
+		            culture = cultureInfo.Name + "/";
+		    }
+		    catch (Exception)
+		    {
+		    }
+
+
 			if (draft)
-				return helper.Content("~/" + Application.Current.Handlers.GetUrlPrefix("DRAFT") + "/" + permalink.ToLower());
-			return helper.Content("~/" + (!Config.PrefixlessPermalinks ?
+                return helper.Content("~/" + culture + Application.Current.Handlers.GetUrlPrefix("DRAFT") + "/" + permalink.ToLower());
+            return helper.Content("~/" + culture+ (!Config.PrefixlessPermalinks ?
 				Application.Current.Handlers.GetUrlPrefix("PERMALINK").ToLower() + "/" : "") + permalink.ToLower());
 		}
 

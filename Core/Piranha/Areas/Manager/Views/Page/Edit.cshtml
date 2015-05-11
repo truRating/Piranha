@@ -106,8 +106,20 @@
     <div class="inner">
         <ul>
             <li><a class="save submit">@Piranha.Resources.Global.ToolbarSaveDraft</a></li>
-            @if (!Model.Page.IsNew) {
-            <li><a href="@Piranha.WebPages.WebPiranha.GetSiteUrl()@Url.GetPermalink(Model.Page.Permalink, true)" target="preview" class="preview">@Piranha.Resources.Global.ToolbarPreview</a></li>
+            @if (!Model.Page.IsNew)
+            {
+                if (Model.SiteTree != null && !string.IsNullOrEmpty(Model.SiteTree.HostNames))
+                {
+                    foreach (var hostName in Model.SiteTree.HostNames.Split(','))
+                    {
+                        <li><a href="@Piranha.WebPages.WebPiranha.GetSiteUrl(hostName)@Url.GetPermalink(Model.Page.Permalink, true)" target="preview" class="preview">@Piranha.Resources.Global.ToolbarPreview</a></li>
+                    }
+                }
+                else
+                {
+                    <li><a href="@Piranha.WebPages.WebPiranha.GetSiteUrl()@Url.GetPermalink(Model.Page.Permalink, true)" target="preview" class="preview">@Piranha.Resources.Global.ToolbarPreview</a></li>
+                }
+
             }
             @if (User.HasAccess("ADMIN_PAGE_PUBLISH")) {
             <li><a class="publish">@(Model.Page.Published == DateTime.MinValue ? Piranha.Resources.Global.ToolbarPublish : Piranha.Resources.Global.ToolbarUpdate)</a></li>
@@ -164,7 +176,7 @@
     @Html.HiddenFor(m => m.Page.Seqno)
     @Html.HiddenFor(m => m.Permalink.Name)
     }
-    @if (!Application.Current.IsMvc) {
+    @if (!Piranha.Application.Current.IsMvc) {
     @Html.HiddenFor(m => m.Page.PageView)
     }
     @Html.Hidden("returl", (string)ViewBag.ReturnUrl)
