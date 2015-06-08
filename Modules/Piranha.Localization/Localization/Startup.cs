@@ -128,6 +128,8 @@ namespace Piranha.Localization
 	        if (model.SiteTree.HostNames == null)
 	            return string.Empty;
 	        var hostName = model.SiteTree.HostNames.Split(',').FirstOrDefault();
+	        if (model.Page.Permalink == null)
+	            return "";
             return  string.Format("<a href=\"{0}/{1}{2}\" class=\"preview\" target=\"preview\">Preview</a>", WebPiranha.GetSiteUrl(hostName), culture.ToLower(),url.GetPermalink(model.Page.Permalink, true));
 	    }
 
