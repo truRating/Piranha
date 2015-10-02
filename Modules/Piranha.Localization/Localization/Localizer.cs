@@ -28,7 +28,8 @@ namespace Piranha.Localization
 			if (def.Name != CultureInfo.CurrentUICulture.Name)
 			{
 			    var cachename = string.Format("Localizer_{0}_{1}", CultureInfo.CurrentUICulture.Name, model.Page.Id);
-			    
+                if (model.Page.IsDraft)
+                    cachename += "_draft";
 
 			    PageTranslation translation;
 			    if (!Application.Current.CacheProvider.Contains(cachename))
@@ -39,7 +40,7 @@ namespace Piranha.Localization
 			            translation = db.PageTranslations
 			                .Include(p => p.Regions)
 			                .SingleOrDefault(
-			                    p => p.PageId == model.Page.Id && !p.IsDraft && p.Culture == CultureInfo.CurrentUICulture.Name);
+			                    p => p.PageId == model.Page.Id && p.IsDraft == model.Page.IsDraft && p.Culture == CultureInfo.CurrentUICulture.Name);
 			            Application.Current.CacheProvider[cachename] = translation;
 			        }
 			    }
@@ -203,6 +204,8 @@ namespace Piranha.Localization
 		/// <param name="publish">The state of the model</param>
 		private static void SaveModel(Models.Manager.PageModels.EditModel model, bool publish) {
             var cachename = string.Format("Localizer_{0}_{1}", CultureInfo.CurrentUICulture.Name, model.Page.Id);
+            if (!publish)
+                cachename += "_draft";
             Application.Current.CacheProvider.Remove(cachename);
 			var js = new JavaScriptSerializer();
 
