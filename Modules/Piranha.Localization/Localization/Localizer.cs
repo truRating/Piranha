@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-using System.Security.Policy;
 using System.Web;
 using System.Web.Script.Serialization;
-using Piranha.Areas.Manager.Views.Shared.EditorTemplates;
-using Piranha.Data;
 using Piranha.Localization.Dto;
 using Piranha.Localization.Entities;
 
@@ -27,25 +24,35 @@ namespace Piranha.Localization
 			//
 			if (def.Name != CultureInfo.CurrentUICulture.Name)
 			{
-			    var cachename = string.Format("Localizer_{0}_{1}", CultureInfo.CurrentUICulture.Name, model.Page.Id);
-                if (model.Page.IsDraft)
-                    cachename += "_draft";
-
 			    PageTranslation translation;
-			    if (!Application.Current.CacheProvider.Contains(cachename))
-			    {
+                if (model.Page.IsDraft)
+                {
+                    using (var db = new Db())
+                    {
+                        translation = db.PageTranslations
+                            .Include(p => p.Regions)
+                            .SingleOrDefault(
+                                p => p.PageId == model.Page.Id && p.IsDraft && p.Culture == CultureInfo.CurrentUICulture.Name);
+                    }
+                }
+                else
+                {
+                    var cachename = string.Format("Localizer_{0}_{1}", CultureInfo.CurrentUICulture.Name, model.Page.Id);
+                    if (!Application.Current.CacheProvider.Contains(cachename))
+                    {
 
-			        using (var db = new Db())
-			        {
-			            translation = db.PageTranslations
-			                .Include(p => p.Regions)
-			                .SingleOrDefault(
-			                    p => p.PageId == model.Page.Id && p.IsDraft == model.Page.IsDraft && p.Culture == CultureInfo.CurrentUICulture.Name);
-			            Application.Current.CacheProvider[cachename] = translation;
-			        }
-			    }
-                translation = (PageTranslation)Application.Current.CacheProvider[cachename];
-			    var js = new JavaScriptSerializer();
+                        using (var db = new Db())
+                        {
+                            translation = db.PageTranslations
+                                .Include(p => p.Regions)
+                                .SingleOrDefault(
+                                    p => p.PageId == model.Page.Id && !p.IsDraft && p.Culture == CultureInfo.CurrentUICulture.Name);
+                            Application.Current.CacheProvider[cachename] = translation;
+                        }
+                    }
+                    translation = (PageTranslation)Application.Current.CacheProvider[cachename];
+                }
+                var js = new JavaScriptSerializer();
 
 			    if (translation == null) return;
 					// Map page values
@@ -204,8 +211,6 @@ namespace Piranha.Localization
 		/// <param name="publish">The state of the model</param>
 		private static void SaveModel(Models.Manager.PageModels.EditModel model, bool publish) {
             var cachename = string.Format("Localizer_{0}_{1}", CultureInfo.CurrentUICulture.Name, model.Page.Id);
-            if (!publish)
-                cachename += "_draft";
             Application.Current.CacheProvider.Remove(cachename);
 			var js = new JavaScriptSerializer();
 
