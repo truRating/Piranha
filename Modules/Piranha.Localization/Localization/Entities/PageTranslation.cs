@@ -59,13 +59,38 @@ namespace Piranha.Localization.Entities
         /// Gets or sets a value indicating whether this translated page is hidden in the sitemap
         /// </summary>
         public bool IsHidden { get; set; }
-		#endregion
 
-		#region Navigation properties
-		/// <summary>
-		/// Gets/sets the available regions.
+
+        /// <summary>
+		/// Gets/sets the created date.
 		/// </summary>
-		public IList<RegionTranslation> Regions { get; set; }
+        public DateTime Created { get; set; }
+
+        /// <summary>
+        /// Gets/sets the updated date.
+        /// </summary>
+        public DateTime Updated { get; set; }
+        /// <summary>
+        /// Gets/sets the date the post was initially published.
+        /// </summary>
+        public DateTime? Published { get; set; }
+
+        /// <summary>
+        /// Gets/sets the date the post was last updated.
+        /// </summary>
+        public DateTime? LastPublished { get; set; }
+
+        /// <summary>
+        /// Gets/sets the last modification date of the page.
+        /// </summary>
+        public DateTime? LastModified { get; set; }
+        #endregion
+
+        #region Navigation properties
+        /// <summary>
+        /// Gets/sets the available regions.
+        /// </summary>
+        public IList<RegionTranslation> Regions { get; set; }
 		#endregion
 
 		/// <summary>

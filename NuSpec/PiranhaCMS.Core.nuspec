@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
 	<metadata>
 		<id>PiranhaCMS.Core</id>
-		<version>2.2.5-alpha6</version>
+		<version>2.2.5-alpha7</version>
 		<title>Piranha CMS Core</title>
 		<authors>Håkan Edling</authors>
 		<owners />

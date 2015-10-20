@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
 	<metadata>
 		<id>PiranhaCMS</id>
-		<version>2.2.5-alpha6</version>
+		<version>2.2.5-alpha7</version>
 		<title>Piranha CMS template for ASP.NET WebPages</title>
 		<authors>Håkan Edling</authors>
 		<owners />
@@ -18,8 +18,8 @@ http://piranhacms.org/home/changelog
 		<copyright>Håkan Edling</copyright>
 		<dependencies>
 			<group targetFramework=".NETFramework4.5">
-				<dependency id="PiranhaCMS.Core" version="[2.2.5-alpha6,2.3.0)" />
-				<dependency id="PiranhaCMS.WebPages" version="[2.2.5-alpha6,2.3.0)" />
+				<dependency id="PiranhaCMS.Core" version="[2.2.5-alpha7,2.3.0)" />
+				<dependency id="PiranhaCMS.WebPages" version="[2.2.5-alpha7,2.3.0)" />
 			</group>
 		</dependencies>
 	</metadata>

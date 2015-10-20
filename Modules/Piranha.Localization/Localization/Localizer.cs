@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Script.Serialization;
 using Piranha.Localization.Dto;
 using Piranha.Localization.Entities;
+using Piranha.Models;
 
 namespace Piranha.Localization
 {
@@ -62,8 +63,8 @@ namespace Piranha.Localization
 					((Models.Page)model.Page).Description = translation.Description;
 					((Models.Page)model.Page).IsHidden = translation.IsHidden;
 
-					// Map regions
-					foreach (var reg in translation.Regions)
+                    // Map regions
+                foreach (var reg in translation.Regions)
 					{
 					    if (!Application.Current.CacheProvider.Contains(reg.TemplateId.ToString()))
 					        Application.Current.CacheProvider[reg.TemplateId.ToString()] = Models.RegionTemplate.GetSingle(reg.TemplateId);
@@ -87,12 +88,46 @@ namespace Piranha.Localization
 			}
 		}
 
+	    public static void LocalizePageListModel(Models.Manager.PageModels.ListModel model)
+	    {
+	        LocalizeSitemap(model.SiteMap);
+	    }
+
+	    private static void LocalizeSitemap(List<Sitemap> pages)
+	    {
+            foreach (var page in pages)
+	        {
+                if (page.Pages.Count > 0)
+                    LocalizeSitemap(page.Pages);
+                if (page.Updated <= page.LastPublished)
+                {
+                    List<PageTranslation> translations;
+                    using (var db = new Db())
+                    {
+                        translations = db.PageTranslations.Where(p => p.PageId == page.Id && p.IsDraft).ToList();
+                    }
+                    if (translations.Any())
+                    {
+                        foreach (var pageTranslation in translations)
+                        {
+                            if (pageTranslation.Updated > pageTranslation.LastPublished ||
+                                pageTranslation.LastPublished == null)
+                            {
+                                page.Updated = pageTranslation.Updated;
+                                page.LastPublished = pageTranslation.LastPublished ?? DateTime.MinValue.AddMilliseconds(1);
+                            }
+                        }
+                    }
+                }
+            }
+	    }
+
         /// <summary>
         /// Returns a list of alternative hrefs for the sitemap
         /// </summary>
         /// <param name="sitemap">The sitemap.</param>
         /// <returns></returns>
-	    public static IEnumerable<SiteMapHrefAlternative> LocalizeSitemapHrefAlternatives(Models.Sitemap sitemap)
+        public static IEnumerable<SiteMapHrefAlternative> LocalizeSitemapHrefAlternatives(Models.Sitemap sitemap)
 	    {
 	        var def = Utils.GetDefaultCulture();
 
@@ -120,6 +155,17 @@ namespace Piranha.Localization
 	                    PermaLink = sitemap.Permalink
 	                };
 	            }
+	        }
+	    }
+
+	    public static List<PageTranslation> GetPageTranslations(Models.Manager.PageModels.EditModel model)
+	    {
+	        using (var db = new Db())
+	        {
+	            var translation = db.PageTranslations
+	                .Where(
+	                    p => p.PageId == model.Page.Id && p.IsDraft).ToList();
+	            return translation;
 	        }
 	    }
 
@@ -215,31 +261,57 @@ namespace Piranha.Localization
 			var js = new JavaScriptSerializer();
 
 			using (var db = new Db()) {
-				var translation = db.PageTranslations
-				    .Include(p => p.Regions).SingleOrDefault(p => p.PageId == model.Page.Id && p.IsDraft != publish && p.Culture == CultureInfo.CurrentUICulture.Name);
+                //try and retrieve the translation if it already exists
+				var translationDraft = db.PageTranslations
+				    .Include(p => p.Regions).SingleOrDefault(p => p.PageId == model.Page.Id && p.IsDraft && p.Culture == CultureInfo.CurrentUICulture.Name);
 
-				if (translation == null) {
-					translation = new Entities.PageTranslation
-					{
-						Id = Guid.NewGuid(),
-						PageId = model.Page.Id,
-						IsDraft = !publish,
-						Culture = CultureInfo.CurrentUICulture.Name,
-                        IsHidden = model.Page.IsHidden
-					};
-					db.PageTranslations.Add(translation);
-				}
 
-				// Map page values
-				translation.Title = model.Page.Title;
-				translation.NavigationTitle = model.Page.NavigationTitle;
-				translation.Keywords = model.Page.Keywords;
-				translation.Description = model.Page.Description;
-			    translation.IsHidden = model.Page.IsHidden;
+                //if it translation doesn't exist create one
+                if (translationDraft == null)
+			    {
+                    translationDraft = new Entities.PageTranslation
+			        {
+			            Id = Guid.NewGuid(),
+			            PageId = model.Page.Id,
+			            IsDraft = true,
+			            Culture = CultureInfo.CurrentUICulture.Name,
+			            IsHidden = model.Page.IsHidden,
+			            Created = DateTime.Now,
+			            Updated = DateTime.Now
+			        };
+			        if (publish)
+			        {
+                        // Set up the dates.
+                        translationDraft.Published = translationDraft.LastPublished = translationDraft.LastModified = translationDraft.Updated;
+			        }
+			        db.PageTranslations.Add(translationDraft);
+			    }
+			    else
+			    {
+			        if (!publish)
+			        {
+                        translationDraft.Updated = DateTime.Now;
+			        }
+			        else
+			        {
+                        translationDraft.LastModified = translationDraft.LastPublished = translationDraft.Updated = DateTime.Now;
+			            if (translationDraft.Published == null || translationDraft.Published == DateTime.MinValue)
+			                translationDraft.Published = translationDraft.Updated;
+			        }
+			    }
 
-				// Delete old region translations for simplicity - no need to expire cache as new ids created.
-				while (translation.Regions.Count > 0)
-					db.RegionTranslations.Remove(translation.Regions[0]);
+                // Map page values
+                translationDraft.Title = model.Page.Title;
+                translationDraft.NavigationTitle = model.Page.NavigationTitle;
+                translationDraft.Keywords = model.Page.Keywords;
+                translationDraft.Description = model.Page.Description;
+                translationDraft.IsHidden = model.Page.IsHidden;
+                translationDraft.Updated = DateTime.Now;
+
+
+			    // Delete old region translations for simplicity - no need to expire cache as new ids created.
+                    while (translationDraft.Regions.Count > 0)
+					db.RegionTranslations.Remove(translationDraft.Regions[0]);
 
 				// Map regions
 				for (var n = 0; n < model.Regions.Count; n++) {
@@ -248,20 +320,83 @@ namespace Piranha.Localization
 					var reg = new Entities.RegionTranslation
 					{
 						Id = Guid.NewGuid(),
-						PageId = translation.Id,
+						PageId = translationDraft.Id,
 						RegionId = region.Id,
 						TemplateId = region.RegiontemplateId,
-						IsDraft = !publish,
+						IsDraft = true,
 						Type = region.Body.GetType().FullName,
 						Culture = CultureInfo.CurrentUICulture.Name
 					};
-					translation.Regions.Add(reg);
+                    translationDraft.Regions.Add(reg);
 
 					if (region.Body is IHtmlString)
 						reg.Body = ((IHtmlString)region.Body).ToHtmlString();
 					else reg.Body = js.Serialize(region.Body);
 				}
-				db.SaveChanges();
+			    if (publish)
+			    {
+			        var translation = db.PageTranslations
+			            .Include(p => p.Regions)
+			            .SingleOrDefault(
+			                p => p.PageId == model.Page.Id && !p.IsDraft && p.Culture == CultureInfo.CurrentUICulture.Name);
+                    //if it translation doesn't exist create one
+                    if (translation == null)
+                    {
+                        translation = new Entities.PageTranslation
+                        {
+                            Id = Guid.NewGuid(),
+                            PageId = model.Page.Id,
+                            IsDraft = false,
+                            Culture = CultureInfo.CurrentUICulture.Name,
+                            IsHidden = model.Page.IsHidden,
+                            Created = translationDraft.Created,
+                            Updated = translationDraft.Updated
+                        };
+                        translation.Published = translation.LastPublished = translation.LastModified = translation.Updated;
+
+                        db.PageTranslations.Add(translation);
+                    }
+                    else
+                    {
+                        translation.LastModified = translation.LastPublished = translation.Updated = translationDraft.Updated;
+                    }
+
+                    // Map page values
+                    translation.Title = model.Page.Title;
+                    translation.NavigationTitle = model.Page.NavigationTitle;
+                    translation.Keywords = model.Page.Keywords;
+                    translation.Description = model.Page.Description;
+                    translation.IsHidden = model.Page.IsHidden;
+                    translation.Updated = DateTime.Now;
+
+
+                    // Delete old region translations for simplicity - no need to expire cache as new ids created.
+                    while (translation.Regions.Count > 0)
+                        db.RegionTranslations.Remove(translation.Regions[0]);
+
+                    // Map regions
+                    for (var n = 0; n < model.Regions.Count; n++)
+                    {
+                        var region = model.Regions[n];
+
+                        var reg = new Entities.RegionTranslation
+                        {
+                            Id = Guid.NewGuid(),
+                            PageId = translation.Id,
+                            RegionId = region.Id,
+                            TemplateId = region.RegiontemplateId,
+                            IsDraft = false,
+                            Type = region.Body.GetType().FullName,
+                            Culture = CultureInfo.CurrentUICulture.Name
+                        };
+                        translation.Regions.Add(reg);
+
+                        if (region.Body is IHtmlString)
+                            reg.Body = ((IHtmlString)region.Body).ToHtmlString();
+                        else reg.Body = js.Serialize(region.Body);
+                    }
+                }
+			    db.SaveChanges();
 			}
 		}
 		#endregion
